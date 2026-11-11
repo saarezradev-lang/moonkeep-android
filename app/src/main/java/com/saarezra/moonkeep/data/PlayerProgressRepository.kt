@@ -1,6 +1,7 @@
 package com.saarezra.moonkeep.data
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -13,7 +14,8 @@ private val Context.dataStore by preferencesDataStore(name = "moonkeep_progress"
 data class PlayerProgress(
     val coins: Int = 0,
     val highestUnlockedLevel: Int = 1,
-    val selectedCharacter: String = "wanderer"
+    val selectedCharacter: String = "wanderer",
+    val allCharactersUnlocked: Boolean = false
 )
 
 /**
@@ -26,13 +28,15 @@ class PlayerProgressRepository(private val context: Context) {
         val COINS = intPreferencesKey("coins")
         val HIGHEST_LEVEL = intPreferencesKey("highest_unlocked_level")
         val CHARACTER = stringPreferencesKey("selected_character")
+        val ALL_CHARACTERS_UNLOCKED = booleanPreferencesKey("all_characters_unlocked")
     }
 
     val progress: Flow<PlayerProgress> = context.dataStore.data.map { prefs ->
         PlayerProgress(
             coins = prefs[Keys.COINS] ?: 0,
             highestUnlockedLevel = prefs[Keys.HIGHEST_LEVEL] ?: 1,
-            selectedCharacter = prefs[Keys.CHARACTER] ?: "wanderer"
+            selectedCharacter = prefs[Keys.CHARACTER] ?: "wanderer",
+            allCharactersUnlocked = prefs[Keys.ALL_CHARACTERS_UNLOCKED] ?: false
         )
     }
 
@@ -63,5 +67,9 @@ class PlayerProgressRepository(private val context: Context) {
 
     suspend fun selectCharacter(characterId: String) {
         context.dataStore.edit { prefs -> prefs[Keys.CHARACTER] = characterId }
+    }
+
+    suspend fun setAllCharactersUnlocked() {
+        context.dataStore.edit { prefs -> prefs[Keys.ALL_CHARACTERS_UNLOCKED] = true }
     }
 }

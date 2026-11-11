@@ -18,11 +18,15 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.saarezra.moonkeep.billing.NoOpBillingManager
+import com.saarezra.moonkeep.billing.UnlockAllCharactersOffer
 import com.saarezra.moonkeep.data.PlayerProgressRepository
 import com.saarezra.moonkeep.game.Characters
 import kotlinx.coroutines.launch
@@ -31,18 +35,59 @@ import kotlinx.coroutines.launch
 fun ShopScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val repo = remember { PlayerProgressRepository(context.applicationContext) }
+    // Swap NoOpBillingManager for a real RevenueCat-backed implementation once
+    // billing is wired in (see README).
+    val billingManager = remember { NoOpBillingManager() }
     val progress by repo.progress.collectAsState(initial = null)
     val scope = rememberCoroutineScope()
+    var purchaseStatus by remember { mutableStateOf<String?>(null) }
+
     val coins = progress?.coins ?: 0
     val selected = progress?.selectedCharacter ?: "wanderer"
+    val allUnlocked = progress?.allCharactersUnlocked ?: false
 
     Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
         Text("Shop", style = MaterialTheme.typography.headlineMedium)
         Text("Coins: $coins")
         Spacer(modifier = Modifier.height(16.dp))
 
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text("Unlock All Characters")
+                    Text(UnlockAllCharactersOffer.PRICE_LABEL)
+                }
+                Button(
+                    enabled = !allUnlocked,
+                    onClick = {
+                        scope.launch {
+                            val result = billingManager.purchaseUnlockAllCharacters()
+                            if (result.isSuccess) {
+                                repo.setAllCharactersUnlocked()
+                                purchaseStatus = null
+                            } else {
+                                purchaseStatus = "Purchases aren't connected yet - see README."
+                            }
+                        }
+                    }
+                ) {
+                    Text(if (allUnlocked) "Unlocked" else "Buy")
+                }
+            }
+        }
+        purchaseStatus?.let {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(it, style = MaterialTheme.typography.bodyLarge)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(Characters.all) { character ->
+                val owned = allUnlocked || character.cost == 0 || character.id == selected
                 Card(modifier = Modifier.padding(vertical = 6.dp).fillMaxWidth()) {
                     Row(
                         modifier = Modifier.padding(16.dp).fillMaxWidth(),
@@ -50,21 +95,21 @@ fun ShopScreen(onBack: () -> Unit) {
                     ) {
                         Column {
                             Text(character.displayName)
-                            if (character.cost > 0) Text("${character.cost} coins")
+                            if (character.cost > 0 && !allUnlocked) Text("${character.cost} coins")
                         }
                         Button(
-                            enabled = character.id == selected || coins >= character.cost,
+                            enabled = character.id == selected || owned || coins >= character.cost,
                             onClick = {
                                 scope.launch {
                                     if (character.id != selected) {
-                                        if (character.cost == 0 || repo.spendCoins(character.cost)) {
+                                        if (owned || repo.spendCoins(character.cost)) {
                                             repo.selectCharacter(character.id)
                                         }
                                     }
                                 }
                             }
                         ) {
-                            Text(if (character.id == selected) "Selected" else "Unlock")
+                            Text(if (character.id == selected) "Selected" else "Select")
                         }
                     }
                 }
