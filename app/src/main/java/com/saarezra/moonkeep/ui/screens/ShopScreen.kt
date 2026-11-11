@@ -29,6 +29,7 @@ import com.saarezra.moonkeep.billing.NoOpBillingManager
 import com.saarezra.moonkeep.billing.UnlockAllCharactersOffer
 import com.saarezra.moonkeep.data.PlayerProgressRepository
 import com.saarezra.moonkeep.game.Characters
+import com.saarezra.moonkeep.ui.theme.MoonSkyBackground
 import kotlinx.coroutines.launch
 
 @Composable
@@ -46,6 +47,7 @@ fun ShopScreen(onBack: () -> Unit) {
     val selected = progress?.selectedCharacter ?: "wanderer"
     val allUnlocked = progress?.allCharactersUnlocked ?: false
 
+    MoonSkyBackground {
     Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
         Text("Shop", style = MaterialTheme.typography.headlineMedium)
         Text("Coins: $coins")
@@ -125,5 +127,6 @@ fun ShopScreen(onBack: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         TextButton(onClick = onBack) { Text("Back") }
+    }
     }
 }

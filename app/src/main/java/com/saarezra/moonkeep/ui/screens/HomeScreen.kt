@@ -16,23 +16,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.saarezra.moonkeep.ui.theme.MoonSkyBackground
 
 @Composable
 fun HomeScreen(onPlay: () -> Unit, onShop: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("MoonKeep", style = MaterialTheme.typography.headlineLarge, textAlign = TextAlign.Center)
-        Text("טירת הירח", style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
-        Spacer(modifier = Modifier.height(48.dp))
-        Button(onClick = onPlay, modifier = Modifier.fillMaxWidth()) {
-            Text("Play")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedButton(onClick = onShop, modifier = Modifier.fillMaxWidth()) {
-            Text("Shop")
+    MoonSkyBackground {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("MoonKeep", style = MaterialTheme.typography.headlineLarge, textAlign = TextAlign.Center)
+            Text("טירת הירח", style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(48.dp))
+            Button(onClick = onPlay, modifier = Modifier.fillMaxWidth()) {
+                Text("Play")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedButton(onClick = onShop, modifier = Modifier.fillMaxWidth()) {
+                Text("Shop")
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.saarezra.moonkeep.data.PlayerProgressRepository
 import com.saarezra.moonkeep.game.Levels
+import com.saarezra.moonkeep.ui.theme.MoonSkyBackground
 
 @Composable
 fun LevelSelectScreen(onLevelSelected: (Int) -> Unit, onBack: () -> Unit) {
@@ -30,22 +31,24 @@ fun LevelSelectScreen(onLevelSelected: (Int) -> Unit, onBack: () -> Unit) {
     val progress by repo.progress.collectAsState(initial = null)
     val highestUnlocked = progress?.highestUnlockedLevel ?: 1
 
-    Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-        Text("Choose a Level", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-        LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.weight(1f)) {
-            items(Levels.all) { level ->
-                val unlocked = level.number <= highestUnlocked
-                Card(
-                    modifier = Modifier.padding(8.dp),
-                    onClick = { if (unlocked) onLevelSelected(level.number) }
-                ) {
-                    Box(modifier = Modifier.padding(24.dp)) {
-                        Text(if (unlocked) "${level.number}" else "🔒")
+    MoonSkyBackground {
+        Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
+            Text("Choose a Level", style = MaterialTheme.typography.headlineMedium)
+            Spacer(modifier = Modifier.height(16.dp))
+            LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.weight(1f)) {
+                items(Levels.all) { level ->
+                    val unlocked = level.number <= highestUnlocked
+                    Card(
+                        modifier = Modifier.padding(8.dp),
+                        onClick = { if (unlocked) onLevelSelected(level.number) }
+                    ) {
+                        Box(modifier = Modifier.padding(24.dp)) {
+                            Text(if (unlocked) "${level.number}" else "🔒")
+                        }
                     }
                 }
             }
+            TextButton(onClick = onBack) { Text("Back") }
         }
-        TextButton(onClick = onBack) { Text("Back") }
     }
 }

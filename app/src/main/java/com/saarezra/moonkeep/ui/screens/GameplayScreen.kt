@@ -24,6 +24,7 @@ import com.saarezra.moonkeep.data.PlayerProgressRepository
 import com.saarezra.moonkeep.game.GameplayViewModel
 import com.saarezra.moonkeep.game.Levels
 import com.saarezra.moonkeep.game.RoundStatus
+import com.saarezra.moonkeep.ui.theme.MoonSkyBackground
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,6 +56,7 @@ fun GameplayScreen(
         }
     }
 
+    MoonSkyBackground {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -93,5 +95,6 @@ fun GameplayScreen(
             Text("Lives: ${viewModel.lives}")
             Text("${viewModel.timeLeftSeconds}s")
         }
+    }
     }
 }

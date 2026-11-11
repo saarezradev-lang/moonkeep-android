@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.saarezra.moonkeep.ui.theme.MoonSkyBackground
 
 @Composable
 fun ResultScreen(
@@ -24,22 +25,24 @@ fun ResultScreen(
     onNext: () -> Unit,
     onBackToLevels: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            if (won) "Level $level Complete!" else "Level $level Failed",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Score: $score")
-        Spacer(modifier = Modifier.height(32.dp))
-        if (won) {
-            Button(onClick = onNext, modifier = Modifier.fillMaxWidth()) { Text("Next Level") }
-            Spacer(modifier = Modifier.height(12.dp))
+    MoonSkyBackground {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                if (won) "Level $level Complete!" else "Level $level Failed",
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Score: $score")
+            Spacer(modifier = Modifier.height(32.dp))
+            if (won) {
+                Button(onClick = onNext, modifier = Modifier.fillMaxWidth()) { Text("Next Level") }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            OutlinedButton(onClick = onBackToLevels, modifier = Modifier.fillMaxWidth()) { Text("Level Select") }
         }
-        OutlinedButton(onClick = onBackToLevels, modifier = Modifier.fillMaxWidth()) { Text("Level Select") }
     }
 }
